@@ -1,3 +1,5 @@
+pub mod config;
+pub mod entry;
 pub mod menu_provider;
 
 use crate::menu_provider::OpenWithMenuProvider;
@@ -12,6 +14,6 @@ fn init(module: *mut GTypeModule) -> GType {
     println!("OpenWithExtensionRs: {}", env!("CARGO_PKG_VERSION"));
 
     NautilusModule::new(module, "OpenWithExtensionRs")
-        .add_menu_provider(OpenWithMenuProvider {})
+        .add_menu_provider(OpenWithMenuProvider)
         .register()
 }
