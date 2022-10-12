@@ -8,25 +8,21 @@ use std::path::Path;
 pub struct OpenWithMenuProvider;
 
 impl MenuProvider for OpenWithMenuProvider {
-    fn get_file_items(
-        &self,
-        _window: *mut GtkWidget,
-        files: &[nautilus_extension::FileInfo],
-    ) -> Vec<nautilus_extension::MenuItem> {
+    fn get_file_items(&self, _window: *mut GtkWidget, files: &[FileInfo]) -> Vec<MenuItem> {
         self.get_menu_item_list(files)
     }
 
     fn get_background_items(
         &self,
         _window: *mut GtkWidget,
-        current_folder: &nautilus_extension::FileInfo,
-    ) -> Vec<nautilus_extension::MenuItem> {
+        current_folder: &FileInfo,
+    ) -> Vec<MenuItem> {
         self.get_menu_item_list(&vec![current_folder.clone()])
     }
 }
 
 impl OpenWithMenuProvider {
-    fn get_menu_item_list(&self, files: &[FileInfo]) -> Vec<nautilus_extension::MenuItem> {
+    fn get_menu_item_list(&self, files: &[FileInfo]) -> Vec<MenuItem> {
         let mut top_menu_item =
             MenuItem::new("OpenTopMenuItem", "Open with", "Open with something", None);
         let mut sub_items: Vec<MenuItem> = Vec::new();
@@ -58,12 +54,10 @@ impl OpenWithMenuProvider {
 
             if e.only_folder.unwrap_or_default()
                 && dirs_count > 0
-                && e.max_folder.unwrap_or_default() as usize >= dirs_count
+                && e.max_folder.unwrap_or(1) as usize >= dirs_count
             {
                 menu_item.set_activate_cb(run_command_cb);
-
                 sub_items.push(menu_item);
-                return;
             }
         });
 
@@ -80,5 +74,7 @@ impl OpenWithMenuProvider {
 nautilus_menu_item_activate_cb!(run_command_cb, run_command);
 
 fn run_command(files: Vec<FileInfo>) {
-    println!("cb");
+    files.iter().for_each(|f| {
+        println!("{}", f.get_uri());
+    });
 }
